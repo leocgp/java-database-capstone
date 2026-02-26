@@ -1,10 +1,10 @@
 # Admin User Stories
 ## User Story 1
 **Title:**
-_As an Admin, I want to log into the portal using my username and password, so that I can securely manage the platform._
+_As an Admin, I want to log into the portal using my email and password, so that I can securely manage the platform._
 
 **Acceptance Criteria:**
-1. The system requires a valid username and password.
+1. The system requires a valid email and password.
 2. If the credentials are correct, the admin is redirected to the Admin Dashboard.
 3. If the credentials are invalid, an error message is displayed.
 4. The session is created only after successful authentication.
