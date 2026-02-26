@@ -20,7 +20,7 @@ public class Admin {
 
     @NotNull(message = "password cannot be null")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password", nullable = false)
     @Size(min = 6)
     private String password;
 
