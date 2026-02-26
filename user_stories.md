@@ -1,4 +1,4 @@
-# <u>Admin User Stories</u>
+# Admin User Stories
 ## User Story 1
 **Title:**
 _As an Admin, I want to log into the portal using my username and password, so that I can securely manage the platform._
@@ -44,7 +44,7 @@ _As an Admin, I want to add doctors to the portal, so that they can access the s
 
 **Notes:**
 - Required fields must not be empty.
-# User Story 4
+## User Story 4
 
 **Title:**
 _As an Admin, I want to delete a doctor’s profile from the portal, so that inactive or incorrect accounts can be removed._
@@ -60,7 +60,7 @@ _As an Admin, I want to delete a doctor’s profile from the portal, so that ina
 
 **Notes:**
 - The system should prevent deletion if the doctor has active appointments.
-# User Story 5
+## User Story 5
 
 **Title:**
 _As an Admin, I want to run a stored procedure to get the number of appointments per month, so that I can track platform usage statistics._
@@ -74,7 +74,7 @@ _As an Admin, I want to run a stored procedure to get the number of appointments
 **Priority:** Medium
 **Story Points:** 5
 
-# <u>Patient User Stories</u>
+# Patient User Stories
 ## User Story 6
 
 **Title:**
@@ -169,7 +169,7 @@ _As a Patient, I want to view my upcoming appointments, so that I can prepare ac
 **Notes:**
 - The system should filter appointments using the current date.
 
-## <u>Doctor User Stories</u>
+# Doctor User Stories
 ## User Story 12
 
 **Title:**
