@@ -10,12 +10,10 @@ This separation keeps responsibilities clear and helps the system remain maintai
 
 ## Section 2: Numbered flow of data and control
 
-1. A user accesses a web dashboard or an API client sends a REST request.
-2. The request is routed to the appropriate controller: a Thymeleaf (MVC) controller for server-rendered pages or a REST controller for API endpoints.
-3. The controller validates input and delegates the action to the service layer.
-4. The service layer executes business logic.
-5. The service calls the repository layer to read/write data.
-6. For structured clinic data, Spring Data JPA repositories interact with MySQL using JPA entities.
-7. For prescription records, Spring Data MongoDB repositories interact with MongoDB using document models.
-8. The repository returns results to the service, then the controller prepares the response.
-9. The response is returned either as a rendered HTML page (Thymeleaf) or as JSON (REST API).
+1. A user accesses the web dashboard or sends a REST API request.
+2. The request is received by the appropriate controller.
+3. The controller delegates the request to the service layer.
+4. The service layer applies business logic and determines the required data operations.
+5. The service calls the appropriate repository.
+6. The repository interacts with the corresponding database to retrieve or persist data.
+7. The result is returned through the service and controller back to the user as either a rendered HTML page or a JSON response.
