@@ -7,15 +7,15 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "admins")
+@Table(name = "admin")
 public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Email
-    @NotNull(message = "email cannot be null")
-    @Column(nullable = false, unique = true)
+    @NotNull(message = "username cannot be null")
+    @Column(name = "username", nullable = false, unique = true)
     private String email;
 
     @NotNull(message = "password cannot be null")

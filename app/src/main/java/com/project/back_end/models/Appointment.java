@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 import java.time.*;
 
 @Entity
-@Table(name = "appointments")
+@Table(name = "appointment")
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,13 +29,13 @@ public class Appointment {
 
     @NotNull(message = "status cannot be null")
     @Column(nullable = false)
-    private String status; // SCHEDULED, COMPLETED, CANCELLED
+    private Integer status; // SCHEDULED = 0 & COMPLETED = 1
 
     @Column
     private String reason;
 
     public Appointment() {}
-    public Appointment(Doctor doctor, Patient patient, LocalDateTime appointmentTime, String status, String reason) {
+    public Appointment(Doctor doctor, Patient patient, LocalDateTime appointmentTime, Integer status, String reason) {
         this.doctor = doctor;
         this.patient = patient;
         this.appointmentTime = appointmentTime;
@@ -62,8 +62,8 @@ public class Appointment {
         return appointmentTime != null ? appointmentTime.toLocalTime() : null;
     }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
 
     public String getReason() { return reason; }
     public void setReason(String reason) { this.reason = reason; }
