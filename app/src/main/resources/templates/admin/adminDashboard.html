@@ -1,3 +1,4 @@
+
 <!-- adminDashboard.html -->
 
 <!-- 
@@ -107,3 +108,95 @@ with search, filter, and modal functionality.
 
  -->
 
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+
+    <link
+            rel="icon"
+            type="image/png"
+            th:href="@{/assets/images/logo/logo.png}"
+    />
+
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" th:href="@{/assets/css/adminDashboard.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}" />
+
+    <script th:src="@{/js/render.js}" defer></script>
+    <script th:src="@{/js/util.js}" defer></script>
+    <script th:src="@{/js/components/header.js}" defer></script>
+    <script th:src="@{/js/components/footer.js}" defer></script>
+</head>
+
+<body onload="renderContent()">
+<div class="container">
+    <div class="wrapper">
+        <div id="header"></div>
+
+        <main class="main-content">
+            <div class="search-filter-bar">
+                <input
+                        type="text"
+                        id="searchBar"
+                        class="input-field"
+                        placeholder="Search doctors..."
+                        aria-label="Search doctors"
+                />
+
+                <select
+                        id="timeFilter"
+                        class="select-dropdown"
+                        aria-label="Filter by time"
+                >
+                    <option value="">All Times</option>
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                </select>
+
+                <select
+                        id="specialtyFilter"
+                        class="select-dropdown"
+                        aria-label="Filter by specialty"
+                >
+                    <option value="">All Specialties</option>
+                    <option value="Cardiologist">Cardiologist</option>
+                    <option value="Dentist">Dentist</option>
+                    <option value="Dermatologist">Dermatologist</option>
+                    <option value="Neurologist">Neurologist</option>
+                    <option value="Orthopedist">Orthopedist</option>
+                    <option value="Pediatrician">Pediatrician</option>
+                </select>
+            </div>
+
+            <div id="content"></div>
+        </main>
+
+        <div id="footer"></div>
+    </div>
+</div>
+
+<div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+        <button id="closeModal" type="button" aria-label="Close modal">
+            &times;
+        </button>
+
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<script
+        type="module"
+        th:src="@{/js/adminDashboard.js}"
+        defer
+></script>
+
+<script
+        type="module"
+        th:src="@{/js/doctorCard.js}"
+        defer
+></script>
+</body>
+</html>
