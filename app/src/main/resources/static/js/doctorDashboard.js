@@ -1,3 +1,83 @@
+import { getAllAppointments } from "./services/appointmentRecordService.js";
+import { createPatientRow } from "./components/patientRows.js";
+
+
+const appointmentTableBody = document.getElementById("patientTableBody");
+let selectedDate  = new Date().toISOString().split("T")[0];
+let token         = localStorage.getItem("token");
+let patientName   = null;
+
+document.getElementById("searchBar").addEventListener("input", (e) => {
+  const input = e.target.value.trim();
+
+  patientName = input === "" ? "null" : input;
+
+  loadAppointments();
+});
+
+document.getElementById("todayButton").addEventListener("click", () => {
+  selectedDate = new Date().toISOString().split("T")[0];
+
+  document.getElementById("datePicker").value = selectedDate;
+
+  loadAppointments();
+});
+
+document.getElementById("datePicker").addEventListener("change", (e) => {
+  selectedDate = e.target.value;
+
+  loadAppointments();
+});
+
+
+async function loadAppointments() {
+  try {
+    const appointments = await getAllAppointments(selectedDate, patientName, token);
+
+    appointmentTableBody.innerHTML = "";
+
+    if (!appointments || appointments.length === 0) {
+      appointmentTableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center;">
+            No Appointments found for today.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    appointments.forEach((appointment) => {
+      const { patient, ...appointmentDetails } = appointment;
+
+      const row = createPatientRow(patient, appointmentDetails);
+
+      appointmentTableBody.appendChild(row);
+    });
+
+  } catch (error) {
+    console.error("Error loading appointments:", error);
+
+    // Display a fallback error message row in the table
+    appointmentTableBody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center; color: red;">
+          Failed to load appointments. Please try again.
+        </td>
+      </tr>
+    `;
+  }
+}
+
+
+// 7. Initial Render on Page Load
+document.addEventListener("DOMContentLoaded", () => {
+  // Set date picker to today's date on load
+  document.getElementById("datePicker").value = selectedDate;
+
+  // Load today's appointments by default
+  loadAppointments();
+});
 /*
   Import getAllAppointments to fetch appointments from the backend
   Import createPatientRow to generate a table row for each patient appointment
