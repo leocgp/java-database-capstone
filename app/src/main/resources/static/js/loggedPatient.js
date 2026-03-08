@@ -43,9 +43,9 @@ export function showBookingOverlay(e, doctor, patient) {
 
   modalApp.innerHTML = `
     <h2>Book Appointment</h2>
-    <input class="input-field" type="text" value="${patient.name}" disabled />
-    <input class="input-field" type="text" value="${doctor.name}" disabled />
-    <input class="input-field" type="text" value="${doctor.specialty}" disabled/>
+    <input class="input-field" type="text" value="${patient.fullName}" disabled />
+    <input class="input-field" type="text" value="${doctor.fullName}" disabled />
+    <input class="input-field" type="text" value="${doctor.specialization}" disabled/>
     <input class="input-field" type="email" value="${doctor.email}" disabled/>
     <input class="input-field" type="date" id="appointment-date" />
     <select class="input-field" id="appointment-time">
@@ -84,46 +84,43 @@ export function showBookingOverlay(e, doctor, patient) {
   });
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    loadDoctorCards();
 
+    const searchBar     = document.getElementById("searchBar");
+    const filterTime    = document.getElementById("filterTime");
+    const filterSpecialization = document.getElementById("filterSpecialization");
 
-// Filter Input
-document.getElementById("searchBar").addEventListener("input", filterDoctorsOnChange);
-document.getElementById("filterTime").addEventListener("change", filterDoctorsOnChange);
-document.getElementById("filterSpecialty").addEventListener("change", filterDoctorsOnChange);
+    if (searchBar)        searchBar.addEventListener("input", filterDoctorsOnChange);
+    if (filterTime)       filterTime.addEventListener("change", filterDoctorsOnChange);
+    if (filterSpecialization)  filterSpecialization.addEventListener("change", filterDoctorsOnChange);
+});
 
+async function filterDoctorsOnChange() {
+    const name           = document.getElementById("searchBar")?.value.trim() || null;
+    const time           = document.getElementById("filterTime")?.value || null;
+    const specialization = document.getElementById("filterSpecialization")?.value || null;
 
+    try {
+        const data = await filterDoctors(name, time, specialization);
+        const doctors = Array.isArray(data) ? data : data?.doctors ?? [];
 
-function filterDoctorsOnChange() {
-  const searchBar = document.getElementById("searchBar").value.trim();
-  const filterTime = document.getElementById("filterTime").value;
-  const filterSpecialty = document.getElementById("filterSpecialty").value;
+        const contentDiv = document.getElementById("content");
+        contentDiv.innerHTML = "";
 
+        if (doctors.length === 0) {
+            contentDiv.innerHTML = "<p>No doctors found.</p>";
+            return;
+        }
 
-  const name = searchBar.length > 0 ? searchBar : null;
-  const time = filterTime.length > 0 ? filterTime : null;
-  const specialty = filterSpecialty.length > 0 ? filterSpecialty : null;
-
-  filterDoctors(name, time, specialty)
-    .then(response => {
-      const doctors = response.doctors;
-      const contentDiv = document.getElementById("content");
-      contentDiv.innerHTML = "";
-
-      if (doctors.length > 0) {
-        console.log(doctors);
         doctors.forEach(doctor => {
-          const card = createDoctorCard(doctor);
-          contentDiv.appendChild(card);
+            const card = createDoctorCard(doctor);
+            contentDiv.appendChild(card);
         });
-      } else {
-        contentDiv.innerHTML = "<p>No doctors found with the given filters.</p>";
-        console.log("Nothing");
-      }
-    })
-    .catch(error => {
-      console.error("Failed to filter doctors:", error);
-      alert("❌ An error occurred while filtering doctors.");
-    });
+
+    } catch (error) {
+        console.error("Error filtering doctors:", error);
+    }
 }
 
 export function renderDoctorCards(doctors) {

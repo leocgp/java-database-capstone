@@ -38,7 +38,7 @@ public class Doctor {
     @Column
     private String phone;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @Column
     private List<String> availableTimes;
 
@@ -74,6 +74,9 @@ public class Doctor {
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+
+    public List<String> getAvailableTimes() {return availableTimes;}
+    public void setAvailableTimes(List<String> availableTimes) {this.availableTimes = availableTimes;}
 
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean active) { isActive = active; }

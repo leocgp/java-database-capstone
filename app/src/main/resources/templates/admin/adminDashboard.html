@@ -144,9 +144,8 @@ with search, filter, and modal functionality.
                         placeholder="Search doctors..."
                         aria-label="Search doctors"
                 />
-
                 <select
-                        id="timeFilter"
+                        id="filterTime"
                         class="select-dropdown"
                         aria-label="Filter by time"
                 >
@@ -156,7 +155,7 @@ with search, filter, and modal functionality.
                 </select>
 
                 <select
-                        id="specialtyFilter"
+                        id="filterSpecialization"
                         class="select-dropdown"
                         aria-label="Filter by specialty"
                 >
@@ -187,16 +186,8 @@ with search, filter, and modal functionality.
     </div>
 </div>
 
-<script
-        type="module"
-        th:src="@{/js/adminDashboard.js}"
-        defer
-></script>
+<script type="module" th:src="@{/js/adminDashboard.js}" defer></script>
 
-<script
-        type="module"
-        th:src="@{/js/doctorCard.js}"
-        defer
-></script>
+<script type="module" th:src="@{/js/components/doctorCard.js}" defer></script>
 </body>
 </html>

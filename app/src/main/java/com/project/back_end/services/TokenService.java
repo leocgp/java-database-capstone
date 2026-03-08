@@ -1,6 +1,107 @@
 package com.project.back_end.services;
+import com.project.back_end.models.*;
+import com.project.back_end.repo.*;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.util.Date;
+
+@Component
 public class TokenService {
+
+    @Autowired
+    private AdminRepository adminRepository;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @Value("${jwt.secret}")
+    private String secret;
+
+    public String generateToken(String identifier) {
+        return Jwts.builder()
+                .subject(identifier)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis()
+                        + 7L * 24 * 60 * 60 * 1000))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public String extractIdentifier(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();                                              // extract email/username
+    }
+
+    public boolean validateToken(String token, String user) {
+        try {
+            String identifier = extractIdentifier(token);
+
+            if (identifier == null) return false;
+            switch (user.toLowerCase()) {
+                case "admin":
+                    Admin admin = adminRepository.findByUsername(identifier);
+                    return admin != null;
+
+                case "doctor":
+                    Doctor doctor = doctorRepository.findByEmail(identifier);
+                    return doctor != null;
+
+                case "patient":
+                    Patient patient = patientRepository.findByEmail(identifier);
+                    return patient != null;
+
+                default:
+                    return false;
+            }
+
+        } catch (Exception e) {
+            System.out.println("Token validation failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = secret.getBytes();
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+
+    public String getEmailFromToken(String token) {
+        return extractIdentifier(token);
+    }
+
+    public Doctor getDoctorFromToken(String token) {
+        try {
+            String email = extractIdentifier(token);
+            return doctorRepository.findByEmail(email);
+        } catch (Exception e) {
+            System.out.println("Error extracting doctor from token: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public Patient getPatientFromToken(String token) {
+        try {
+            String email = extractIdentifier(token);
+            return patientRepository.findByEmail(email);
+        } catch (Exception e) {
+            System.out.println("Error extracting patient from token: " + e.getMessage());
+            return null;
+        }
+    }
+}
 // 1. **@Component Annotation**
 // The @Component annotation marks this class as a Spring component, meaning Spring will manage it as a bean within its application context.
 // This allows the class to be injected into other Spring-managed components (like services or controllers) where it's needed.
@@ -38,6 +139,3 @@ public class TokenService {
 // - If the role or user does not exist, it returns false, indicating the token is invalid.
 // - The method gracefully handles any errors by returning false if the token is invalid or an exception occurs.
 // This ensures secure access control based on the user's role and their existence in the system.
-
-
-}

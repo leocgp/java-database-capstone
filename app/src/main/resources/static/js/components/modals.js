@@ -1,11 +1,15 @@
 // modals.js
+export function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
 export function openModal(type) {
   let modalContent = '';
   if (type === 'addDoctor') {
     modalContent = `
          <h2>Add Doctor</h2>
          <input type="text" id="doctorName" placeholder="Doctor Name" class="input-field">
-         <select id="specialization" class="input-field select-dropdown">
+         <select id="doctorSpecialization" class="input-field select-dropdown">
              <option value="">Specialization</option>
                         <option value="cardiologist">Cardiologist</option>
                         <option value="dermatologist">Dermatologist</option>

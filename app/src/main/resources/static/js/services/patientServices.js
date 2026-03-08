@@ -1,16 +1,13 @@
-// patientServices
 import { API_BASE_URL } from "../config/config.js";
 const PATIENT_API = API_BASE_URL + '/patient'
 
-
-//For creating a patient in db
 export async function patientSignup(data) {
   try {
     const response = await fetch(`${PATIENT_API}`,
       {
         method: "POST",
         headers: {
-          "Content-type": "application/json"
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(data)
       }
@@ -27,8 +24,8 @@ export async function patientSignup(data) {
   }
 }
 
-//For logging in patient
 export async function patientLogin(data) {
+  console.log("patientLogin URL:", `${PATIENT_API}/login`);
   console.log("patientLogin :: ", data)
   return await fetch(`${PATIENT_API}/login`, {
     method: "POST",
@@ -37,11 +34,8 @@ export async function patientLogin(data) {
     },
     body: JSON.stringify(data)
   });
-
-
 }
 
-// For getting patient data (name ,id , etc ). Used in booking appointments
 export async function getPatientData(token) {
   try {
     const response = await fetch(`${PATIENT_API}/${token}`);
@@ -54,10 +48,9 @@ export async function getPatientData(token) {
   }
 }
 
-// the Backend API for fetching the patient record(visible in Doctor Dashboard) and Appointments (visible in Patient Dashboard) are same based on user(patient/doctor).
 export async function getPatientAppointments(id, token, user) {
   try {
-    const response = await fetch(`${PATIENT_API}/${id}/${user}/${token}`);
+    const response = await fetch(`${PATIENT_API}/${id}/${token}`);
     const data = await response.json();
     console.log(data.appointments)
     if (response.ok) {
@@ -72,8 +65,10 @@ export async function getPatientAppointments(id, token, user) {
 }
 
 export async function filterAppointments(condition, name, token) {
+    const c = condition || 'null';
+    const n = name      || 'null';
   try {
-    const response = await fetch(`${PATIENT_API}/filter/${condition}/${name}/${token}`, {
+    const response = await fetch(`${PATIENT_API}/filter/${c}/${n}/${token}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

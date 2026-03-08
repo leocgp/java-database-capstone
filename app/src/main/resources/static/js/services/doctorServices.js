@@ -6,7 +6,7 @@ export async function getDoctors() {
   try {
     const response = await fetch(DOCTOR_API);
     const data = await response.json();
-    return data;
+    return data.doctors ?? data;
   } catch (error) {
     console.error("Error fetching doctors:", error);
     return [];
@@ -28,7 +28,7 @@ export async function deleteDoctor(id, token) {
 
 export async function saveDoctor(doctor, token) {
   try {
-    const response = await fetch(`${DOCTOR_API}/add?token=${token}`, {
+    const response = await fetch(`${DOCTOR_API}/${token}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(doctor),
@@ -41,17 +41,23 @@ export async function saveDoctor(doctor, token) {
   }
 }
 
-export async function filterDoctors(name, time, specialty) {
-  try {
-    const response = await fetch(
-      `${DOCTOR_API}/filter/${name ?? 'null'}/${time ?? 'null'}/${specialty ?? 'null'}`
-    );
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    alert("Error filtering doctors: " + error.message);
-    return [];
-  }
+export async function filterDoctors(name, time, specialization) {
+    try {
+        console.log("Filtering with:", { name, time, specialization });
+
+        const url = `${DOCTOR_API}/filter/${name ?? 'null'}/${time ?? 'null'}/${specialization ?? 'null'}`;
+        console.log("Filter URL:", url);
+
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log("Filter response:", data);
+
+        return Array.isArray(data) ? data : data.doctors ?? [];
+
+    } catch (error) {
+        alert("Error filtering doctors: " + error.message);
+        return [];
+    }
 }
 /*
   Import the base API URL from the config file

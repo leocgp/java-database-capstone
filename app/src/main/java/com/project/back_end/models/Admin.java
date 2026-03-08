@@ -16,7 +16,7 @@ public class Admin {
     @Email
     @NotNull(message = "username cannot be null")
     @Column(name = "username", nullable = false, unique = true)
-    private String email;
+    private String username;
 
     @NotNull(message = "password cannot be null")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -38,16 +38,16 @@ public class Admin {
     }
 
     public Admin() {}
-    public Admin(String email, String password, String fullName) {
-        this.email = email;
+    public Admin(String username, String password, String fullName) {
+        this.username = username;
         this.password = password;
         this.fullName = fullName;
     }
 
     public Long getId() {return id;}
 
-    public String getEmail() {return email;}
-    public void setEmail(String email) {this.email = email;}
+    public String getUsername() {return username;}
+    public void setUsername(String username) {this.username = username;}
 
     public String getPassword() {return password;}
     public void setPassword(String password) {this.password = password;}

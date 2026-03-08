@@ -81,7 +81,7 @@ Main Content Section (`.main-content`)
 
   text-align: center;
 
-  background-image: url("index.png");
+  background-image: url("/assets/images/defineRole/index.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

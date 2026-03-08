@@ -1,6 +1,223 @@
 package com.project.back_end.services;
+import com.project.back_end.DTO.AppointmentDTO;
+import com.project.back_end.models.Appointment;
+import com.project.back_end.models.Doctor;
+import com.project.back_end.models.Patient;
+import com.project.back_end.repo.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
 public class PatientService {
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private TokenService tokenService;
+
+    public int createPatient(Patient patient) {
+        try {
+            patientRepository.save(patient);
+            return 1;
+
+        } catch (Exception e) {
+            System.out.println("Error creating patient: " + e.getMessage());
+            return 0;
+        }
+    }
+
+    public ResponseEntity<Map<String, Object>> getPatientAppointment(Long id, String token) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String email = tokenService.getEmailFromToken(token);
+
+            Doctor doctor = doctorRepository.findByEmail(email);
+            if (doctor == null) {
+                Patient tokenPatient = patientRepository.findByEmail(email);
+
+                if (tokenPatient == null) {
+                    response.put("message", "Unauthorized. Invalid token.");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+                }
+                if (!tokenPatient.getId().equals(id)) {
+                    response.put("message", "Unauthorized. ID mismatch.");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+                }
+            }
+
+            List<Appointment> appointments = appointmentRepository.findByPatientId(id);
+            List<AppointmentDTO> appointmentDTOs = appointments.stream()
+                    .map(a -> new AppointmentDTO(
+                            a.getId(),
+                            a.getDoctor().getId(),
+                            a.getDoctor().getFullName(),
+                            a.getPatient().getId(),
+                            a.getPatient().getFullName(),
+                            a.getPatient().getEmail(),
+                            a.getPatient().getPhone(),
+                            a.getPatient().getAddress(),
+                            a.getAppointmentTime(),
+                            a.getStatus()
+                    ))
+                    .collect(Collectors.toList());
+
+            response.put("appointments", appointmentDTOs);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.out.println("Error fetching patient appointments: " + e.getMessage());
+            response.put("message", "An error occurred while fetching appointments.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    public ResponseEntity<Map<String, Object>> filterByCondition(String condition, Long id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            int status = condition.equalsIgnoreCase("past") ? 1 : 0;
+
+            List<Appointment> appointments = appointmentRepository
+                    .findByPatient_IdAndStatusOrderByAppointmentTimeAsc(id, status);
+            List<AppointmentDTO> appointmentDTOs = appointments.stream()
+                    .map(a -> new AppointmentDTO(
+                            a.getId(),
+                            a.getDoctor().getId(),
+                            a.getDoctor().getFullName(),
+                            a.getPatient().getId(),
+                            a.getPatient().getFullName(),
+                            a.getPatient().getEmail(),
+                            a.getPatient().getPhone(),
+                            a.getPatient().getAddress(),
+                            a.getAppointmentTime(),
+                            a.getStatus()
+                    ))
+                    .collect(Collectors.toList());
+
+            response.put("appointments", appointmentDTOs);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.out.println("Error filtering by condition: " + e.getMessage());
+            response.put("message", "An error occurred while filtering appointments.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    public ResponseEntity<Map<String, Object>> filterByDoctor(String name, Long patientId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Appointment> appointments = appointmentRepository
+                    .searchByDoctorNameAndPatientId(name, patientId);
+
+            List<AppointmentDTO> appointmentDTOs = appointments.stream()
+                    .map(a -> new AppointmentDTO(
+                            a.getId(),
+                            a.getDoctor().getId(),
+                            a.getDoctor().getFullName(),
+                            a.getPatient().getId(),
+                            a.getPatient().getFullName(),
+                            a.getPatient().getEmail(),
+                            a.getPatient().getPhone(),
+                            a.getPatient().getAddress(),
+                            a.getAppointmentTime(),
+                            a.getStatus()
+                    ))
+                    .collect(Collectors.toList());
+
+            response.put("appointments", appointmentDTOs);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.out.println("Error filtering by doctor: " + e.getMessage());
+            response.put("message", "An error occurred while filtering by doctor.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    public ResponseEntity<Map<String, Object>> filterByDoctorAndCondition(
+            String condition, String name, long patientId) {
+
+        Map<String, Object> response = new HashMap<>();
+        try {
+            int status = condition.equalsIgnoreCase("past") ? 1 : 0;
+
+            List<Appointment> appointments = appointmentRepository
+                    .searchByDoctorNameAndPatientIdAndStatus(name, patientId, status);
+            List<AppointmentDTO> appointmentDTOs = appointments.stream()
+                    .map(a -> new AppointmentDTO(
+                            a.getId(),
+                            a.getDoctor().getId(),
+                            a.getDoctor().getFullName(),
+                            a.getPatient().getId(),
+                            a.getPatient().getFullName(),
+                            a.getPatient().getEmail(),
+                            a.getPatient().getPhone(),
+                            a.getPatient().getAddress(),
+                            a.getAppointmentTime(),
+                            a.getStatus()
+                    ))
+                    .collect(Collectors.toList());
+
+            response.put("appointments", appointmentDTOs);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.out.println("Error filtering by doctor and condition: " + e.getMessage());
+            response.put("message", "An error occurred while filtering appointments.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    public ResponseEntity<Map<String, Object>> getPatientDetails(String token) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String email = tokenService.getEmailFromToken(token);
+
+            Patient patient = patientRepository.findByEmail(email);
+
+            if (patient == null) {
+                response.put("message", "Patient not found.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+
+            response.put("patient", patient);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.out.println("Error fetching patient details: " + e.getMessage());
+            response.put("message", "An error occurred while fetching patient details.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    private AppointmentDTO convertToDTO(Appointment a) {
+        return new AppointmentDTO(
+                a.getId(),
+                a.getDoctor().getId(),
+                a.getDoctor().getFullName(),
+                a.getPatient().getId(),
+                a.getPatient().getFullName(),
+                a.getPatient().getEmail(),
+                a.getPatient().getPhone(),
+                a.getPatient().getAddress(),
+                a.getAppointmentTime(),
+                a.getStatus()
+        );
+    }
+}
 // 1. **Add @Service Annotation**:
 //    - The `@Service` annotation is used to mark this class as a Spring service component. 
 //    - It will be managed by Spring's container and used for business logic related to patients and appointments.
@@ -52,7 +269,3 @@ public class PatientService {
 // 10. **Use of DTOs (Data Transfer Objects)**:
 //    - The service uses `AppointmentDTO` to transfer appointment-related data between layers. This ensures that sensitive or unnecessary data (e.g., password or private patient information) is not exposed in the response.
 //    - Instruction: Ensure that DTOs are used appropriately to limit the exposure of internal data and only send the relevant fields to the client.
-
-
-
-}

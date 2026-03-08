@@ -1,33 +1,36 @@
-import { openModal, closeModal } from "../components/modals.js";
+import { openModal, closeModal } from "./components/modals.js";
 import { getDoctors, filterDoctors, saveDoctor } from "./services/doctorServices.js";
 import { createDoctorCard } from "./components/doctorCard.js";
 
-document.getElementById('addDocBtn').addEventListener('click', () => {
-  openModal('addDoctor');
-});
+window.openModal = openModal;
+window.closeModal = closeModal;
 
 window.addEventListener("DOMContentLoaded", () => {
+    const addDocBtn = document.getElementById('addDocBtn');
+    if (addDocBtn) addDocBtn.addEventListener('click', () => openModal('addDoctor'));
+
   loadDoctorCards();
   setupFilterListeners();
 });
 
 async function loadDoctorCards() {
-  try {
-    const doctors = await getDoctors();
+    try {
+        const data = await getDoctors();
+        const doctors = Array.isArray(data) ? data : data.doctors ?? [];
 
-    const contentDiv = document.getElementById("content");
-    contentDiv.innerHTML = "";
+        const contentDiv = document.getElementById("content");
+        contentDiv.innerHTML = "";
 
-    if (doctors.length === 0) {
-      contentDiv.innerHTML = "<p>No doctors found.</p>";
-      return;
+        if (doctors.length === 0) {
+            contentDiv.innerHTML = "<p>No doctors found.</p>";
+            return;
+        }
+        renderDoctorCards(doctors);
+
+    } catch (error) {
+        console.error("Error loading doctor cards:", error);
+        alert("Failed to load doctors. Please try again.");
     }
-    renderDoctorCards(doctors);
-
-  } catch (error) {
-    console.error("Error loading doctor cards:", error);
-    alert("Failed to load doctors. Please try again.");
-  }
 }
 function renderDoctorCards(doctors) {
   const contentDiv = document.getElementById("content");
@@ -43,38 +46,42 @@ function renderDoctorCards(doctors) {
   });
 }
 function setupFilterListeners() {
-  document.getElementById("searchBar").addEventListener("input", filterDoctorsOnChange);
-  document.getElementById("filterTime").addEventListener("change", filterDoctorsOnChange);
-  document.getElementById("filterSpecialty").addEventListener("change", filterDoctorsOnChange);
+  const searchBar       = document.getElementById("searchBar");
+  const filterTime      = document.getElementById("filterTime");
+  const filterSpecialization = document.getElementById("filterSpecialization");
+
+  if (searchBar)        searchBar.addEventListener("input", filterDoctorsOnChange);
+  if (filterTime)       filterTime.addEventListener("change", filterDoctorsOnChange);
+  if (filterSpecialization)  filterSpecialization.addEventListener("change", filterDoctorsOnChange);
 }
 
 async function filterDoctorsOnChange() {
-  const name      = document.getElementById("searchBar").value.trim() || null;
-  const time      = document.getElementById("filterTime").value || null;
-  const specialty = document.getElementById("filterSpecialty").value || null;
+    const name           = document.getElementById("searchBar")?.value.trim() || null;
+    const time           = document.getElementById("filterTime")?.value || null;
+    const specialization = document.getElementById("filterSpecialization")?.value || null;
 
-  try {
-    const doctors = await filterDoctors(name, time, specialty);
+    try {
+        const doctors = await filterDoctors(name, time, specialization);
 
-    const contentDiv = document.getElementById("content");
-    contentDiv.innerHTML = "";
+        const contentDiv = document.getElementById("content");
+        contentDiv.innerHTML = "";
 
-    if (!doctors || doctors.length === 0) {
-      contentDiv.innerHTML = "<p>No doctors found.</p>";
-      return;
+        if (!doctors || doctors.length === 0) {
+            contentDiv.innerHTML = "<p>No doctors found.</p>";
+            return;
+        }
+
+        renderDoctorCards(doctors);
+
+    } catch (error) {
+        console.error("Error filtering doctors:", error);
+        alert("Failed to filter doctors: " + error.message);
     }
-
-    renderDoctorCards(doctors);
-
-  } catch (error) {
-    console.error("Error filtering doctors:", error);
-    alert("Failed to filter doctors: " + error.message);
-  }
 }
 
 window.adminAddDoctor = async function () {
   const name      = document.getElementById("doctorName").value.trim();
-  const specialty = document.getElementById("doctorSpecialty").value.trim();
+  const specialization = document.getElementById("doctorSpecialization").value.trim();
   const email     = document.getElementById("doctorEmail").value.trim();
   const password  = document.getElementById("doctorPassword").value.trim();
   const phone    = document.getElementById("doctorPhone").value.trim();
@@ -84,7 +91,7 @@ window.adminAddDoctor = async function () {
   );
   const availability = Array.from(availabilityCheckboxes).map((cb) => cb.value);
 
-  const doctor = { name, specialty, email, password, phone, availability };
+  const doctor = { fullName: name, specialization, email, password, phone, availableTimes: availability };
 
   const token = localStorage.getItem("token");
   if (!token) {
@@ -111,7 +118,7 @@ window.adminAddDoctor = async function () {
 /*
   This script handles the admin dashboard functionality for managing doctors:
   - Loads all doctor cards
-  - Filters doctors by name, time, or specialty
+  - Filters doctors by name, time, or specialization
   - Adds a new doctor via modal form
 
 
@@ -140,11 +147,11 @@ window.adminAddDoctor = async function () {
 
 
   Function: filterDoctorsOnChange
-  Purpose: Filter doctors based on name, available time, and specialty
+  Purpose: Filter doctors based on name, available time, and specialization
 
     Read values from the search bar and filters
     Normalize empty values to null
-    Call filterDoctors(name, time, specialty) from the service
+    Call filterDoctors(name, time, specialization) from the service
 
     If doctors are found:
     - Render them using createDoctorCard()
@@ -165,7 +172,7 @@ window.adminAddDoctor = async function () {
   Purpose: Collect form data and add a new doctor to the system
 
     Collect input values from the modal form
-    - Includes name, email, phone, password, specialty, and available times
+    - Includes name, email, phone, password, specialization, and available times
 
     Retrieve the authentication token from localStorage
     - If no token is found, show an alert and stop execution

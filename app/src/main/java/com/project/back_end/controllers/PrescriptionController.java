@@ -1,7 +1,57 @@
 package com.project.back_end.controllers;
+import com.project.back_end.models.Prescription;
+import com.project.back_end.services.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("${api.path}" + "prescription")
 public class PrescriptionController {
-    
+
+    @Autowired
+    private PrescriptionService prescriptionService;
+
+    @Autowired
+    private MainService service;
+
+
+    @PostMapping("/{token}")
+    public ResponseEntity<Map<String, Object>> savePrescription(
+            @RequestBody Prescription prescription,
+            @PathVariable String token) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        Map<String, Object> tokenValidation = service.validateToken(token, "doctor");
+        if (!tokenValidation.isEmpty()) {
+            response.put("message", tokenValidation.get("message"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        return prescriptionService.savePrescription(prescription);
+    }
+
+    @GetMapping("/{appointmentId}/{token}")
+    public ResponseEntity<Map<String, Object>> getPrescription(
+            @PathVariable Long appointmentId,
+            @PathVariable String token) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        Map<String, Object> tokenValidation = service.validateToken(token, "doctor");
+        if (!tokenValidation.isEmpty()) {
+            response.put("message", tokenValidation.get("message"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        return prescriptionService.getPrescription(appointmentId);
+    }
+}
 // 1. Set Up the Controller Class:
 //    - Annotate the class with `@RestController` to define it as a REST API controller.
 //    - Use `@RequestMapping("${api.path}prescription")` to set the base path for all prescription-related endpoints.
@@ -28,6 +78,3 @@ public class PrescriptionController {
 //    - Validates the token for the `"doctor"` role using the shared service.
 //    - If the token is valid, fetches the prescription using the `PrescriptionService`.
 //    - Returns the prescription details or an appropriate error message if validation fails.
-
-
-}

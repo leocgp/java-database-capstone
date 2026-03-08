@@ -12,20 +12,25 @@ const doctorId = urlParams.get("doctorId");
 document.addEventListener("DOMContentLoaded", initializePage);
 
 async function initializePage() {
-  try {
-    if (!token) throw new Error("No token found");
+    try {
+        if (!token) throw new Error("No token found");
 
-    const appointmentData = await getPatientAppointments(patientId, token, "doctor") || [];
+        console.log("patientId:", patientId, "doctorId:", doctorId);
 
-    // Filter by both patientId and doctorId
-    const filteredAppointments = appointmentData.filter(app =>
-      app.doctorId == doctorId);
-    console.log(filteredAppointments)
-    renderAppointments(filteredAppointments);
-  } catch (error) {
-    console.error("Error loading appointments:", error);
-    alert("❌ Failed to load your appointments.");
-  }
+        const appointmentData = await getPatientAppointments(patientId, token, "doctor") || [];
+
+        console.log("appointmentData:", appointmentData);
+
+        const filteredAppointments = appointmentData.filter(app =>
+            app.doctorId == doctorId);
+
+        console.log("filteredAppointments:", filteredAppointments);
+
+        renderAppointments(filteredAppointments);
+    } catch (error) {
+        console.error("Error loading appointments:", error);
+        alert("❌ Failed to load your appointments.");
+    }
 }
 
 function renderAppointments(appointments) {

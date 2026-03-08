@@ -32,8 +32,9 @@ document.getElementById("datePicker").addEventListener("change", (e) => {
 
 async function loadAppointments() {
   try {
-    const appointments = await getAllAppointments(selectedDate, patientName, token);
-
+    const data = await getAllAppointments(selectedDate, patientName, token);
+    const appointments = Array.isArray(data) ? data : data?.appointments ?? [];
+    console.log("appointment:", appointments[0]);
     appointmentTableBody.innerHTML = "";
 
     if (!appointments || appointments.length === 0) {
@@ -48,17 +49,16 @@ async function loadAppointments() {
     }
 
     appointments.forEach((appointment) => {
-      const { patient, ...appointmentDetails } = appointment;
+        const { patient, ...appointmentDetails } = appointment;
 
-      const row = createPatientRow(patient, appointmentDetails);
+        const row = createPatientRow(patient, appointmentDetails.id, appointmentDetails.doctor.id);
 
-      appointmentTableBody.appendChild(row);
+        appointmentTableBody.appendChild(row);
     });
 
   } catch (error) {
     console.error("Error loading appointments:", error);
 
-    // Display a fallback error message row in the table
     appointmentTableBody.innerHTML = `
       <tr>
         <td colspan="6" style="text-align: center; color: red;">
@@ -69,13 +69,9 @@ async function loadAppointments() {
   }
 }
 
-
-// 7. Initial Render on Page Load
 document.addEventListener("DOMContentLoaded", () => {
-  // Set date picker to today's date on load
   document.getElementById("datePicker").value = selectedDate;
 
-  // Load today's appointments by default
   loadAppointments();
 });
 /*

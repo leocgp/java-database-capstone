@@ -1,20 +1,24 @@
-import { openModal } from '../components/modal.js';
+import { openModal } from '../components/modals.js';
 import { API_BASE_URL } from '../config/config.js';
 
-const ADMIN_API = API_BASE_URL + '/admin';
+const ADMIN_API = API_BASE_URL + '/admin/login';
 const DOCTOR_API = API_BASE_URL + '/doctor/login'
 
+window.openModal = openModal;
+
 window.onload = function () {
-    const adminBtn = document.getElementById('adminLogin');
-    const doctorBtn = document.getElementById('doctorLogin');
+    const adminBtn = document.getElementById('adminBtn');
+    const doctorBtn = document.getElementById('doctorBtn');
     if (adminBtn) {
         adminBtn.addEventListener('click', () => {
         openModal('adminLogin');
     });
+    }
     if (doctorBtn) {
         doctorBtn.addEventListener('click', () => {
         openModal('doctorLogin');
     });
+    }
 }
 window.adminLoginHandler = async function adminLoginHandler() {
     const username = document.getElementById("username").value;
@@ -45,7 +49,7 @@ window.doctorLoginHandler = async function doctorLoginHandler() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
-    const doctor = { username, password };
+    const doctor = { identifier: email, password };
     try {
         const response = await fetch(`${DOCTOR_API}`, {
           method: "POST",

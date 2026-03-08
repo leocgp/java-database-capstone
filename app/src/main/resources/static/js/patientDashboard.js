@@ -2,10 +2,11 @@
 import { getDoctors } from './services/doctorServices.js';
 import { openModal } from './components/modals.js';
 import { createDoctorCard } from './components/doctorCard.js';
-import { filterDoctors } from './services/doctorServices.js';//call the same function to avoid duplication coz the functionality was same
+import { filterDoctors } from './services/doctorServices.js';
 import { patientSignup, patientLogin } from './services/patientServices.js';
 
-
+window.openModal = openModal;
+window.closeModal = closeModal;
 
 document.addEventListener("DOMContentLoaded", () => {
   loadDoctorCards();
@@ -42,44 +43,38 @@ function loadDoctorCards() {
       console.error("Failed to load doctors:", error);
     });
 }
-// Filter Input
-document.getElementById("searchBar").addEventListener("input", filterDoctorsOnChange);
-document.getElementById("filterTime").addEventListener("change", filterDoctorsOnChange);
-document.getElementById("filterSpecialty").addEventListener("change", filterDoctorsOnChange);
+const searchBar           = document.getElementById("searchBar");
+const filterTime          = document.getElementById("filterTime");
+const filterSpecialization = document.getElementById("filterSpecialization");
 
+if (searchBar)            searchBar.addEventListener("input", filterDoctorsOnChange);
+if (filterTime)           filterTime.addEventListener("change", filterDoctorsOnChange);
+if (filterSpecialization) filterSpecialization.addEventListener("change", filterDoctorsOnChange);
 
+async function filterDoctorsOnChange() {
+    const name           = document.getElementById("searchBar")?.value.trim() || null;
+    const time           = document.getElementById("filterTime")?.value || null;
+    const specialization = document.getElementById("filterSpecialization")?.value || null;
 
-function filterDoctorsOnChange() {
-  const searchBar = document.getElementById("searchBar").value.trim();
-  const filterTime = document.getElementById("filterTime").value;
-  const filterSpecialty = document.getElementById("filterSpecialty").value;
+    try {
+        const data = await filterDoctors(name, time, specialization);
+        const doctors = Array.isArray(data) ? data : data?.doctors ?? [];
 
+        const contentDiv = document.getElementById("content");
+        contentDiv.innerHTML = "";
 
-  const name = searchBar.length > 0 ? searchBar : null;
-  const time = filterTime.length > 0 ? filterTime : null;
-  const specialty = filterSpecialty.length > 0 ? filterSpecialty : null;
-
-  filterDoctors(name, time, specialty)
-    .then(response => {
-      const doctors = response.doctors;
-      const contentDiv = document.getElementById("content");
-      contentDiv.innerHTML = "";
-
-      if (doctors.length > 0) {
-        console.log(doctors);
+        if (!doctors || doctors.length === 0) {
+            contentDiv.innerHTML = "<p>No doctors found.</p>";
+            return;
+        }
         doctors.forEach(doctor => {
-          const card = createDoctorCard(doctor);
-          contentDiv.appendChild(card);
+            const card = createDoctorCard(doctor);
+            contentDiv.appendChild(card);
         });
-      } else {
-        contentDiv.innerHTML = "<p>No doctors found with the given filters.</p>";
-        console.log("Nothing");
-      }
-    })
-    .catch(error => {
-      console.error("Failed to filter doctors:", error);
-      alert("❌ An error occurred while filtering doctors.");
-    });
+
+    } catch (error) {
+        console.error("Error filtering doctors:", error);
+    }
 }
 
 window.signupPatient = async function () {
@@ -90,7 +85,7 @@ window.signupPatient = async function () {
     const phone = document.getElementById("phone").value;
     const address = document.getElementById("address").value;
 
-    const data = { name, email, password, phone, address };
+    const data = { fullName: name, email, password, phone, address };
     const { success, message } = await patientSignup(data);
     if (success) {
       alert(message);
@@ -110,7 +105,7 @@ window.loginPatient = async function () {
     const password = document.getElementById("password").value;
 
     const data = {
-      email,
+      identifier: email,
       password
     }
     console.log("loginPatient :: ", data)
@@ -131,6 +126,4 @@ window.loginPatient = async function () {
     alert("❌ Failed to Login : ", error);
     console.log("Error :: loginPatient :: ", error)
   }
-
-
 }

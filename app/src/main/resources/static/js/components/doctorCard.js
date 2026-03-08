@@ -1,6 +1,6 @@
 import { showBookingOverlay } from "../loggedPatient.js";
 import { deleteDoctor } from "../services/doctorServices.js";
-import { getPatientData } from "../patientServices.js";
+import { getPatientData } from "../services/patientServices.js";
 
 export function createDoctorCard(doctor){
     const card = document.createElement("div");
@@ -20,7 +20,7 @@ export function createDoctorCard(doctor){
     const availableTimesList = document.createElement("ul");
     doctor.availableTimes.forEach(time => {
       const li = document.createElement("li");
-      li.textContent = new Date(time).toLocaleString();
+      li.textContent = time;
       availableTimesList.appendChild(li);
     });
 
@@ -54,7 +54,7 @@ export function createDoctorCard(doctor){
             console.error("Delete doctor failed:", err);
             alert("Failed to delete doctor. Please try again.");
           }
-      }
+      });
       actionsDiv.appendChild(removeBtn);
     }else if (role === "patient") {
        const bookNow = document.createElement("button");
@@ -71,7 +71,7 @@ export function createDoctorCard(doctor){
          const patientData = await getPatientData(token);
          showBookingOverlay(e, doctor, patientData);
        });
-       actionDiv.appendChild(bookNow);
+       actionsDiv.appendChild(bookNow);
      }
      card.appendChild(infoDiv);
      card.appendChild(actionsDiv);
