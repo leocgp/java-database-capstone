@@ -19,7 +19,7 @@ function renderHeader(){
     let headerContent = `<header class="header">
                         <div class="logo-section">
                         <img src="../assets/images/logo/logo.png" alt="Hospital CRM Logo" class="logo-img">
-                        <span class="logo-title">Hospital CMS</span>
+                        <span class="logo-title"><a href="/">Hospital CMS</a></span>
                         </div>
                         <nav>`;
     if ((role === "loggedPatient" || role === "admin" || role === "doctor") && !token) {

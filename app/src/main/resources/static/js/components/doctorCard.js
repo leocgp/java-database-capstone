@@ -9,7 +9,7 @@ export function createDoctorCard(doctor){
     const infoDiv = document.createElement("div");
     infoDiv.classList.add("doctor-info");
     const name = document.createElement("h3");
-    name.textContent = doctor.name;
+    name.textContent = doctor.fullName;
     const specialization = document.createElement("p");
     specialization.textContent = doctor.specialization;
     const email = document.createElement("p");

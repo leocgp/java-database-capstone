@@ -25,6 +25,20 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  backend:
+    image: smart-clinic-backend
+    container_name: smart-clinic
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://smartclinic-mysql:3306/cms
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpass
+      SPRING_DATA_MONGODB_URI: mongodb://root:rootpass@smartclinic-mongo:27017/smart_clinic?authSource=admin
+    depends_on:
+      - mysql
+      - mongo
+
 volumes:
   mysql_data:
   mongo_data:

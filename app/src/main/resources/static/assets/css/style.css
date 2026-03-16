@@ -206,6 +206,9 @@
   .dashboard-btn{
     width: 100%;
   }
+  .cancel-btn{
+    width: 100%
+  }
 
   .input-field {
     padding: 10px;
