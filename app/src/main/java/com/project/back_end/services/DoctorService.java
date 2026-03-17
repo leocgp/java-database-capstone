@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
 @Service
 public class DoctorService {
 
-    // ── Repositories & Services ───────────────────────────────────────────────
-
     @Autowired
     private DoctorRepository doctorRepository;
 
@@ -29,9 +27,6 @@ public class DoctorService {
 
     @Autowired
     private TokenService tokenService;
-
-
-    // ── 1. Get Doctor Availability ────────────────────────────────────────────
 
     public List<String> getDoctorAvailability(Long doctorId, LocalDate date) {
         try {
@@ -60,9 +55,6 @@ public class DoctorService {
         }
     }
 
-
-    // ── 2. Save Doctor ────────────────────────────────────────────────────────
-
     public int saveDoctor(Doctor doctor) {
         try {
             Doctor existing = doctorRepository.findByEmail(doctor.getEmail());
@@ -77,9 +69,6 @@ public class DoctorService {
             return 0;
         }
     }
-
-
-    // ── 3. Update Doctor ──────────────────────────────────────────────────────
 
     public int updateDoctor(Doctor doctor) {
         try {
@@ -96,9 +85,6 @@ public class DoctorService {
         }
     }
 
-
-    // ── 4. Get All Doctors ────────────────────────────────────────────────────
-
     public List<Doctor> getDoctors() {
         try {
             return doctorRepository.findAll();
@@ -107,9 +93,6 @@ public class DoctorService {
             return new ArrayList<>();
         }
     }
-
-
-    // ── 5. Delete Doctor ──────────────────────────────────────────────────────
 
     public int deleteDoctor(long id) {
         try {
@@ -127,8 +110,6 @@ public class DoctorService {
         }
     }
 
-
-    // ── 6. Validate Doctor Login ──────────────────────────────────────────────
 
     public ResponseEntity<Map<String, Object>> validateDoctor(Login login) {
         Map<String, Object> response = new HashMap<>();
@@ -158,8 +139,6 @@ public class DoctorService {
     }
 
 
-    // ── 7. Find Doctor By Name ────────────────────────────────────────────────
-
     public Map<String, Object> findDoctorByName(String name) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -173,8 +152,6 @@ public class DoctorService {
         }
     }
 
-
-    // ── 8. Filter By Name, Specialization & Time ─────────────────────────────
 
     public Map<String, Object> filterDoctorsByNameSpecializationAndTime(
             String name, String specialization, String amOrPm) {
@@ -194,9 +171,6 @@ public class DoctorService {
             return response;
         }
     }
-
-
-    // ── 9. Filter By Name & Time ──────────────────────────────────────────────
 
     public Map<String, Object> filterDoctorByNameAndTime(String name, String amOrPm) {
         Map<String, Object> response = new HashMap<>();
@@ -249,10 +223,8 @@ public class DoctorService {
     public Map<String, Object> filterDoctorByTimeAndSpecialization(String specialization, String amOrPm) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // Filter by specialization first
             List<Doctor> doctors = doctorRepository.findBySpecializationIgnoreCase(specialization);
 
-            // Then filter by AM/PM availability
             List<Doctor> filtered = filterDoctorByTime(doctors, amOrPm);
             response.put("doctors", filtered);
             return response;
@@ -263,9 +235,6 @@ public class DoctorService {
             return response;
         }
     }
-
-
-    // ── 12. Filter By Specialization ───────────────────────────────────────────────
 
     public Map<String, Object> filterDoctorBySpecialization(String specialization) {
         Map<String, Object> response = new HashMap<>();
