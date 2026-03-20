@@ -170,7 +170,7 @@ back-end/
 
 ### 1. Clone the repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/leocgp/java-database-capstone
 cd back-end
 ```
 
@@ -251,4 +251,3 @@ The app uses JWT tokens for authentication. Tokens are:
 
 - `spring.jpa.hibernate.ddl-auto=update` — automatically creates/updates tables on startup
 - Fresh Docker deployments will recreate tables from entity definitions
-- Column naming follows JPA field names (e.g. `fullName` → `full_name`)
